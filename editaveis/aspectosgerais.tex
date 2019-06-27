@@ -42,9 +42,9 @@ Essa sessão é destinado ao levantamento teórico da solução proposta para o 
 
 \section{Logica Proposicional}
 
-A logica proposicional é um sistema formal destinado para a representação de proposições e sentenças declarativas, que podem possir valores verdadeiros ou falsos.
+A logica proposicional é um sistema destinado para a representação de proposições e sentenças declarativas, que podem possuir valores verdadeiros ou falsos.
 
-Uma logica proposicional possui regras estabelecidas para sua formulação onde é utilizado conectivos lógicos para seu desenvolvimento esses conectivos permitidos são $\land$ (e), $\lor$ (ou), $\lnot$ (negação), $\Rightarrow$ (se...então), $\iff$ (se e somente se). Através desses podemos construir sentenças compostas que são elaboradas através da junção de sentenças com conectores dando assim a possibilidade da representação de expressões logicas mais complexas.
+Uma logica proposicional possui regras estabelecidas para sua formulação onde é utilizado conectivos lógicos para seu desenvolvimento esses conectivos permitidos são $\land$ (e), $\lor$ (ou), $\lnot$ (negação), $\Rightarrow$ (se...então), $\iff$ (se e somente se). Através desses podemos construir sentenças compostas que são elaboradas através da junção de sentenças com os conectores mencionados, dando assim a possibilidade da representação de expressões logicas mais complexas.
 
 
 \section{SAT}
@@ -72,15 +72,17 @@ x1 & x2 & y & tipo\\
 \end{tabular}
 \end{center}
 
+\subsection{Resolvedores SAT}
+
+Os resolvedores SAT são programas especializados em encontrar soluções satisfatórias para uma logica Proposicional, ele utiliza de métodos avançados para uma resolução rapida do algoritmo, o que é vital para logica sat por ser um problema NP-completo.
+
 \section{Pseudo Boolean}
 
 As funções pseudo-booleanas tem intuito de realizar o mapeamento de valores booleanos para números reais, isso ocorre através do uso de variáveis booleanas junto a restrições de desigualdade linear com coeficientes inteiros que agem como um peso nas variáveis booleanas.
 	
-A vantagem do uso das funções pseudo booleanas esta na facilidade de abstração de problemas através das restriçoes pseudo booleanas, e por sua proximidade com SAT pode ser resolvida polinomialmente com o uso de SAT solvers.  
+A vantagem do uso das funções pseudo booleanas esta na facilidade de abstração de problemas através das restrições pseudo booleanas, e por sua proximidade com SAT pode ser resolvida polinomialmente com o uso de SAT solvers.  
 
 \chapter[Trabalhos Correlatos]{Trabalhos Correlatos}
-
-\section{Introdução}
 
 Esse capitulo visa dissecar e compreender os trabalhos que servem como base para o desenvolvimento desse projeto.
 
@@ -94,14 +96,26 @@ Pela a proposta de resolução do problema se basear em técnicas pseudo-boolean
     \item Afinidades de tipos de aplicações em nuvens computacionais.\cite{fabio2014}
 \end{itemize}
 
-Os trabalhos citados a cima são divididos em duas formulações que visão encontrar uma decisão satisfatória para o problema em menor tempo hábil. Por esse motivo a estrutura desse capitulo comtemplara uma primeira formulação vigente ao trabalho \cite{bruno2012} e apos isso sera analizado a evolução da formulação que se encontra no trabalho \cite{bruno2013}. 
+Os trabalhos citados a cima são divididos em duas formulações que visão encontrar uma decisão satisfatória para o problema em menor tempo hábil. Por esse motivo a estrutura desse capitulo contemplará uma primeira formulação vigente ao trabalho \cite{bruno2012} e apos isso sera analisado a evolução da formulação que se encontra no trabalho \cite{bruno2013}. 
 
 
 \section{Primeira Formulação Pseudo Booleana}
 
-Como explicado no topico 3.3 sobre logica pseudo booleana, para representar um problema através dessa logica é necessário abstrair o problema em variáveis booleanas e disjunções de grandeza.
+Como explicado no tópico 3.3 sobre logica pseudo booleana, para representar um problema através dessa logica é necessário abstrair o problema em variáveis booleanas e disjunções de grandeza.
 
 Na solução definida no artigo \cite{bruno2012} e definido seis conjuntos de restrições para minimizar o uso de maquinas ligadas, a obtenção dessas formulas foram feita através da abstração do problema e essas são:
+ 
+ \subsection{Variáveis}
+
+As variáveis boolianas definidas para restrições são hwi para representar o hardware onde 1 é quando a maquina esta ligada e 0 ela desligada.
+
+Para a representação das maquinas virtuais foi feito uma representação diferente, onde cada variável possui sua representatividade e sua maquina designada, exemplo:
+
+$$ vm_1^{ram \cdot hw2}$$
+
+A variável do exemplo nesse contexto tem a representação a memoria ram da maquina virtual 1 rodando no hardware 2.
+
+Desse modo a quantidade de variáveis do problema é $(N + K \cdot 2)$ sendo N a quantidade de hardware e K a quantidade de maquinas virtuais.
  
  \subsection{Formula Objetivo}
  
@@ -211,50 +225,60 @@ $$vm_3^{proc \cdot hw1} \cdot vm_{3}^{ram \cdot hw1} \cdot hw_{1}^{proc} \cdot h
 
 \section{Segunda Formulação Pseudo Booleana}
 
+Essa seção visa mostrar a evolução da formulação anterior, onde foi utilizado mais restrições porem menos variáveis, o que se mostrou mais simples para a resolução.
+
+\subsection{Variáveis}
+
+As variáveis definidas na segunda formulação são hwi que continuam sendo as variáveis referente ao hardware, a variável $vm_j^{hwi}$ referente a maquina virtual  j rodando no hardware i e as variáveis N e K que são o numero total de hardware e de maquinas virtuais respectivamente.
+
+Portanto o numero gerado de variáveis na formulação é $(N+N \cdot K) $ variáveis.
+
+
+
 \subsection{Formula Objetivo}
  
  Como na abordagem da primeira formulação o principal objetivo é reduzir as maquinas virtuais ligada, e com isso a formula se manteve a mesma.
 
- $$[1] \qquad min: \sum_{i=1}^{n} hw_{i}$$	
+ $$[7] \qquad min: \sum_{i=1}^{n} hw_{i}$$	
 
 \subsection{Acomodar recursos em hardwares ligados}
 
-As duas formulas a seguir redtrigem que o somatorio dos recursos dos hardwares ligados acomodem os recursos utilizados pela maquinas virtuais.
+As duas formulas a seguir restringem que o somatório dos recursos dos hardwares ligados acomodem os recursos utilizados pela maquinas virtuais.
 
-$$[1] \qquad \sum_{i=1}^{n} Ram_{hwi} \cdot hw_{i} \geq \sum_{j=1}^{k} Ram_{vmj} $$
+$$[8] \qquad \sum_{i=1}^{n} Ram_{hwi} \cdot hw_{i} \geq \sum_{j=1}^{k} Ram_{vmj} $$
 
-$$[1] \qquad \sum_{i=1}^{n} Proc_{hwi} \cdot hw_{i} \geq \sum_{j=1}^{k} Proc_{vmj} $$
+$$[9] \qquad \sum_{i=1}^{n} Proc_{hwi} \cdot hw_{i} \geq \sum_{j=1}^{k} Proc_{vmj} $$
 
 \subsection{Limites superiores}
 
 As restriçoes a seguir di respeito ao quanto de recurso as maquinas podem prover as maquinas virtuais
 
 
-$$[1] \qquad \forall i \in 1..n (\sum_{j=1}^{k} (Ram_{vmj} \cdot \lnot{vm_{j}^{hwi}}) + Rhw_{i} \cdot hw_i \geq \sum_{j=1}^{k} Ram_{vmj})$$
+$$[10] \qquad \forall i \in 1..n (\sum_{j=1}^{k} (Ram_{vmj} \cdot \lnot{vm_{j}^{hwi}}) + Rhw_{i} \cdot hw_i \geq \sum_{j=1}^{k} Ram_{vmj})$$
 
-$$[1] \qquad \forall i \in 1..n (\sum_{j=1}^{k} (Proc_{vmj} \cdot \lnot{vm_{j}^{hwi}}) + Rhw_{i} \cdot hw_i \geq \sum_{j=1}^{k} Proc_{vmj})$$
+$$[11] \qquad \forall i \in 1..n (\sum_{j=1}^{k} (Proc_{vmj} \cdot \lnot{vm_{j}^{hwi}}) + Rhw_{i} \cdot hw_i \geq \sum_{j=1}^{k} Proc_{vmj})$$
 
 \subsection{Alocação Obrigatoria}
 
 Essa restrição define que cada maquina virtual deve esta alocada a um hardware.
 
-$$[1] \qquad \forall i \in 1..n  \sum_{j=1}^{k} (vm_j^{hwi} \geq 1)$$
+$$[12] \qquad \forall i \in 1..n  \sum_{j=1}^{k} (vm_j^{hwi} \geq 1)$$
 
 \subsection{Alocação unica}
 
 E por fima ultima restrição garnte que uma maquina virtual possui alocação em apenas em um hardware, não podendo dividir os recursos da vm para distruibuir.
 
-$$[1] \qquad \forall \quad i  \in 1..K (\sum_{i=1}^{N} \lnot{vm_j^{hwi}} \geq N - 1)$$
+$$[13] \qquad \forall \quad j  \in 1..K (\sum_{i=1}^{N} \lnot{vm_j^{hwi}} \geq N - 1)$$
 
 \subsection{Exemplo}
 
 Nessa seção será mostrado a construção das formulas utilizando a segunda formulação, sera atribuído os mesmos valores do exemplo 3.2.5.
 
-[1]
+[7]
 
 $$min: \quad hw1 + hw2 $$
 
-[2] e [3]
+[8] e [9]
 
 $$100 \cdot hw_1 + 30 \cdot hw_2 \geq 90$$ 
 
@@ -262,7 +286,7 @@ $$100 \cdot hw_1 + 30 \cdot hw_2 \geq 90$$
 $$20 \cdot hw_1 + 10 \cdot hw_2 \geq 30$$ 
 
 
-[4] e [5]
+[10] e [11]
 
 $$ (50 \cdot \lnot{vm_1^{hw1}}) + (30  \cdot \lnot{vm_2^{hw1}}) + (10  \cdot \lnot{vm_3^{hw1}}) + 100 \cdot hw_1 \geq 90 $$ 
 
@@ -274,29 +298,73 @@ $$ (5 \cdot \lnot{vm_1^{hw1}}) + (20  \cdot \lnot{vm_2^{hw1}}) + (5  \cdot \lnot
 
 $$ (5 \cdot \lnot{vm_1^{hw2}}) + (20  \cdot \lnot{vm_2^{hw2}}) + (5  \cdot \lnot{vm_3^{hw2}}) + 30 \cdot hw_2 \geq 30 $$
 
-[6]
+[12]
 
 $$ vm_1^{hw1} + vm_2^{hw1} + vm_3^{hw1} \geq 1 $$
 
 
 $$ vm_1^{hw2} + vm_2^{hw2} + vm_3^{hw2} \geq 1 $$
 
-[7]
+[13]
+ 
+$$ \lnot{vm_1^{hw1}} + \lnot{vm_1^{hw2}} \geq 1$$
 
-$$(\lnot{vm^{hwi}_j} + \lnot{vm_k^{hwi}})$$\
+$$ \lnot{vm_2^{hw1}} + \lnot{vm_2^{hw2}} \geq 1$$
+
+$$ \lnot{vm_3^{hw1}} + \lnot{vm_3^{hw2}} \geq 1$$
+
 
 \section{Afinidade de aplicações}
 
 Essa seção visa trabalhar com as classes de aplicações e suas afinidades, seguindo o estudo afinidades de tipos de aplicações em nuvens computacionais \cite{fabio2014}.
 
-O estudo baseia se em classes de aplicações que podem ser rodadas nas maquinas virtuais chamadas de classes dwarfs essas sendo divididas em treze categorias sendo essas:
+Em detrimento de analisar aplicações e suas afinidades há a necessidade de um modo de diferenciar as aplicações existentes, para isso o estudo \cite{fabio2014} absorve para o seu trabalho a categorização de aplicações por classes  \textit{dwarfs}.
 
-\includegraphics[width=0.9\textwidth]{tabela_dwarf.png}
+As classes dwarfs foram elaboradas com o fundamento de capturar o padrão de computação e comunicação de uma aplicação, essa classificação foi primeiramente vista no estudo \cite{colella2014} onde este divide os de aplicações em sete partes, e com a progressão do tempo o estudo foi expandido pela equipe de programação paralela de Berkeley para 13 categorias. \cite{asanovic2006}.
 
-Porem para o estudo foram realizados os testes apenas com os dwarfs de grafo transversal, grade estruturada e matriz densa, pois esses contemplam a maiorias das aplicações que necessitam de hospedagem.
+O estudo de afinidade do Licht é utilizado no trabalho realizado em Berkeley porem reduzindo os estudos para apenas 3 das categorias existentes, já que estes nos estudos apresentados essas classes se assemelham mais com a maioria das aplicações utilizadas em servidores, sendo essas:
 
-Para o desenvolvimento do estudo foi utilizado as bibliotecas de programação paralela OpenCL e OpenMP junto do pacote de brenchmark rodinia, que possuem módulos característicos dos tipos de dwarfs citados.
 
+\begin{itemize}
+
+
+\item Grafo Transversal
+
+Esse algoritmo é do tipo que realiza muitas visitas nos nós de um grafo, normalmente a execução desse algoritmo consome muita memoria ram.
+
+\item Grade Estruturada
+
+Esse algoritmo os dados são organizados em uma tabela regular, onde á o processamento de vários dados dessa tabela e a cada atualização da grade todos os pontos são atualizados.
+
+\item Álgebra Linear Densa
+
+Esse algoritmo faz operações com matrizes e vetores densos.
+
+\end{itemize}
+
+Para ilustrar melhor as aplicações e suas similaridades com as categorias pode ser visto através do gráfico abaixo, onde as cores indicam o grau de utilização sendo vermelho muito utilizado e azul de baixa utilização.
+
+\includegraphics[]{aplicacaoDwarfs.png}
+
+Outro ponto considerado no estudo é que quando as aplicações rodam juntos em uma maquina fisica há a necessidade da paralelização dos recursos, para que haja a optimização das aplicações, para isso o estudo voltou a estudar duas bibliotecas para esse fim muito utilizadas sendo elas as  OpenCL (Open Computing Language) e a OpenMP (Open Multi Processing).
+
+
+Então a partir dos módulos específicos foram realizados os testes para as duas bibliotecas de programação paralela em ambiente real e virtualizado obtendo os resultados encontrados no anexo A, que são mostrados através da porcentagem de perda de desempenho do algoritmo.
+
+Analisando ele pode se perceber que apesar do numero limitado de classes, a biblioteca de paralelização afeta também o resultado final, tornando um problema ainda mais complexo a afinidade entre algoritmos.
+
+
+\begin{itemize}
+
+\item LUD - Algebra Linear Densa
+
+\item Kmeans - Álgebra Linear Densa
+
+\item SRAD - Grade Estruturada
+
+\item B+tree - Grafo Transversal
+
+\end{itemize}
 
 \chapter[Proposta]{Proposta}
 
@@ -304,28 +372,67 @@ A proposta levantada nessa etapa e que sera executada no trabalho de conclusão 
 
 Na modelagem atual a formulação faz a optimização considerando apenas alocação das maquinas por quantidade de cpu e memoria ram, porem essa abordagem considerando apenas isso desconsidera uma possibilidade que ocorre no mundo real de concorrência entre maquinas virtuais.
 
+Para acoplar a afinidade de classe e por sua vez adequá ao problema real, é visado para segunda parte desse projeto adicionar a formulação logicas que referenciem as classes dwarfs é as bibliotecas de paralelização.
+
 Portanto é esperado que ao estender a formulação seja possível manter o padrão que a segunda formulação traz de minimizar os equipamentos ligados, porem evitando conflitos com aplicações com baixa afinidade.
 
 Para a conclusão no projeto em sua totalidade é esperado que as seguintes perguntas sejam respondidas:
 
 \begin{itemize}
     \item A solução tem aplicabilidade real ?
-    \item Qual o custo do algorítimo ?
-    \item Quais métricas devem ser consideradas para determinar se o tempo do algorítimo é viável ?
-    \item O algorítimo possui um ponto onde deixa de compensar ?
-    \item O algorítimo pode ser melhorado ? 
+    \item Qual o custo do algoritmo ?
+    \item Quais métricas devem ser consideradas para determinar se o tempo do algoritmo é viável ?
+    \item O algoritmo possui um ponto onde deixa de compensar ?
+    \item O algoritmo pode ser melhorado ? 
     \item As restrições da segunda formulação pode ser aprimoradas ?
     \item É necessário acrescentar novas restrições ou um pre-processamento dos dados resolve o problema ?  
 \end{itemize}
 
 
+\chapter{Planejamento}
+
+Esse capitulo tem o proposito de explicar como será feito o desenvolvimento do TCC 2, ilustrando suas etapas e o cronograma para ser realizado essas atividades.  
 
 \section{Etapas do Projeto}
 
-\subsection{Estudo}
+Para a execução de um bom projeto é necessário obter consistência no desenvolvimento do mesmo, para isso é importante definir etapas para o workflow do mesmo, porem é importante ressaltar que a boa definição de um processo de desenvolvimento não garante que o algoritmo seja efetivo e sim que o estudos feitos em cima do problema foram. 
+
+
+\subsection{Estudo e Planejamento}
+
+Essa etapa é destinada para um estudo de possíveis hipóteses para a nova formulação, ao sair dessa etapa não há a necessidade de uma formulação bem estruturada e sim uma lista de prováveis ideias para a formulação para serem executadas.
+
 \subsection{Preparação dos dados}
+
+Essa etapa é a menor da listadas, ela tem o objetivo de preparar dados para os testes a serem realizados.
+
 \subsection{Ciclo de Formulação e testes}
+    
+Nessa etapa as hipóteses formuladas serão consolidadas através das restrições e testadas com os dados fornecidos, descartando formulações que se mostrem sem progressão e aprimorando as melhores.
+
+Essa etapa é vista como um ciclo pois é baseada em formulação e testes que tende a se aperfeiçoar através de interações onde o ciclo tem sua finalização més que antecedem a entrega do trabalho.
+    
 \subsubsection{Avaliação e Comparativo}
+
+A ultima etapa, e que conclui o trabalho, é a analise dos resultados obtidos, o viés dessa etapa é chegar a conclusão sobre a formulação final e seu desenvolvimento, discorrendo sobre fatos pertinentes no projeto através de métricas que também serão definidas nessa etapa.
+
+É esperado que nessa essa etapa sejam respondidas as perguntas definidas na proposta, concluindo assim o projeto.
 
 
 \section[Cronograma]{Cronograma}
+\begin{table}[!htb]
+    \centering
+    \caption{Cronograma}
+    \begin{tabular}{ |c|c|c| } 
+        \hline
+        Atividade & Data de Inicio & Data Fim\\
+        \hline
+        Estudo e Planejamento & 12/07/2019 & 12/08/2019  \\
+        Preparação dos dados & 12/07/2019 & 19/08/2019  \\
+        Ciclo de Formulação e testes & 19/08/2019 & 25/11/2019 \\
+        Avaliação e Comparativo & 25/11/2019 & 01/11/2019 \\
+        Conclusão e Apresentação do Trabalho & 01/12/2019 & 10/12/2019  \\
+        Fim do Semestre & 10/12/2019 & --  \\ 
+        \hline
+    \end{tabular}
+\end{table}
